@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smalter - Tableau de bord</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body class="bg-gray-50">
+  <nav class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+      <div class="flex flex-wrap justify-between items-center min-h-14 sm:min-h-16 py-2 gap-2 sm:gap-3">
+        <!-- Logo Section -->
+        <div class="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
+          <img src="ginnovation.png" alt="Ginnovation" class="h-5 sm:h-6 md:h-8 lg:h-10 w-auto object-contain">
+          <div class="h-5 sm:h-6 md:h-8 w-px bg-gray-300"></div>
+          <img src="smalter.png" alt="Smalter" class="h-5 sm:h-6 md:h-8 lg:h-10 w-auto object-contain">
+        </div>
+        
+        <!-- User Section -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div class="flex items-center gap-1 sm:gap-2">
+            <span class="text-xs px-2 py-1 rounded-full whitespace-nowrap" id="role-badge"></span>
+            <span class="hidden xs:inline text-xs sm:text-sm text-gray-700 max-w-[80px] sm:max-w-[120px] truncate">
+              <span class="font-medium" id="user-name">utilisateur</span>
+            </span>
+          </div>
+          <button id="logout-button" class="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors whitespace-nowrap">
+            <span class="hidden sm:inline">Déconnexion</span>
+            <span class="sm:hidden">Déconnexion</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="min-h-screen p-3 sm:p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-3 sm:mb-4 md:mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 break-words">Smalter avancement mapping</h1>
+            <p class="text-xs sm:text-sm md:text-base text-gray-600 mt-1">Suivi de l'avancement du projet</p>
+          </div>
+          <div class="flex-shrink-0">
+            <button id="add-row-button" class="hidden w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs sm:text-sm whitespace-nowrap" onclick="openAddModal()">+ Ajouter</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+            <div class="text-xs sm:text-sm text-blue-600 font-medium mb-1">Objectif avancement</div>
+            <div class="text-lg sm:text-xl md:text-2xl font-bold text-blue-900">7.69%</div>
+            <div class="text-xs text-blue-600 mt-1">par semaine</div>
+          </div>
+          <div class="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+            <div class="text-xs sm:text-sm text-green-600 font-medium mb-2">Avancement total</div>
+            <div class="text-lg sm:text-xl md:text-2xl font-bold text-green-900 mb-2" id="total-progress">0.00%</div>
+            <div class="w-full bg-green-200 rounded-full h-2 sm:h-3">
+              <div id="progress-bar" class="bg-green-600 h-2 sm:h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
+            <div class="text-xs sm:text-sm text-orange-600 font-medium mb-1">Date limite</div>
+            <div class="text-lg sm:text-xl md:text-2xl font-bold text-orange-900">18 Février 2026</div>
+            <div class="text-xs text-orange-600 mt-1">Reste <span id="days-remaining"></span> jours</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 md:mb-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 text-center">
+          <div class="min-w-0"><div class="text-xs sm:text-sm text-gray-600 truncate">Pages totales</div><div class="text-base sm:text-lg md:text-xl font-bold text-gray-900" id="stat-pages">0</div></div>
+          <div class="min-w-0"><div class="text-xs sm:text-sm text-gray-600 truncate">Pages exécutées</div><div class="text-base sm:text-lg md:text-xl font-bold text-green-600" id="stat-executed">0</div></div>
+          <div class="min-w-0"><div class="text-xs sm:text-sm text-gray-600 truncate">Backend logique</div><div class="text-base sm:text-lg md:text-xl font-bold text-blue-600" id="stat-backend">0</div></div>
+          <div class="min-w-0"><div class="text-xs sm:text-sm text-gray-600">Modules</div><div class="text-base sm:text-lg md:text-xl font-bold text-purple-600" id="stat-modules">0</div></div>
+          <div class="min-w-0"><div class="text-xs sm:text-sm text-gray-600">Menus</div><div class="text-base sm:text-lg md:text-xl font-bold text-indigo-600" id="stat-menus">0</div></div>
+          <div class="min-w-0"><div class="text-xs sm:text-sm text-gray-600 truncate">Sous-menus</div><div class="text-base sm:text-lg md:text-xl font-bold text-pink-600" id="stat-submenus">0</div></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 md:mb-6">
+        <div class="flex flex-col gap-2 sm:gap-3">
+          <div class="flex-1 min-w-0">
+            <input id="search-input" type="text" placeholder="Rechercher..." class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" oninput="filterTable()"/>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <select id="module-filter" class="flex-1 px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" onchange="filterTable()">
+              <option value="">Tous les modules</option>
+            </select>
+            <button onclick="clearFilters()" class="px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors whitespace-nowrap">Réinitialiser</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto -mx-3 sm:mx-0">
+          <div class="inline-block min-w-full align-middle px-3 sm:px-0">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Module</th>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Menu</th>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Sous-menu</th>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Pages</th>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Exéc.</th>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Backend</th>
+                  <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">Avanc.</th>
+                </tr>
+              </thead>
+              <tbody id="table-body" class="bg-white divide-y divide-gray-200"></tbody>
+              <tfoot class="bg-gray-100 border-t-2 border-gray-300">
+                <tr class="font-bold">
+                  <td colspan="3" class="px-2 sm:px-3 md:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">TOTAL</td>
+                  <td class="px-2 sm:px-3 md:px-4 py-3 sm:py-4 text-xs sm:text-sm text-center text-blue-900 whitespace-nowrap" id="footer-pages">0</td>
+                  <td class="px-2 sm:px-3 md:px-4 py-3 sm:py-4 text-xs sm:text-sm text-center text-green-900 whitespace-nowrap" id="footer-executed">0</td>
+                  <td class="px-2 sm:px-3 md:px-4 py-3 sm:py-4 text-xs sm:text-sm text-center text-purple-900 whitespace-nowrap" id="footer-backend">0</td>
+                  <td class="px-2 sm:px-3 md:px-4 py-3 sm:py-4 text-xs sm:text-sm text-center whitespace-nowrap"><span class="text-sm sm:text-base md:text-lg font-bold text-gray-900" id="footer-progress">0.00%</span></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 sm:mt-4 md:mt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-xs sm:text-sm text-gray-700 text-center sm:text-left">Affichage de <span class="font-medium" id="page-start">1</span> à <span class="font-medium" id="page-end">0</span> sur <span class="font-medium" id="page-total">0</span></div>
+        <div class="flex gap-1 sm:gap-2 flex-wrap justify-center" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4">
+    <div class="bg-white rounded-lg shadow-xl p-4 sm:p-5 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <h3 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Modifier les valeurs</h3>
+      <div class="space-y-3 sm:space-y-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-1">Pages</label><input id="edit-pages" type="number" min="0" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md"/></div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-1">Pages exécutées</label><input id="edit-executed" type="number" min="0" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md"/></div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-1">Backend logique</label><input id="edit-backend" type="number" min="0" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md"/></div>
+      </div>
+      <div class="mt-4 sm:mt-6 flex gap-2 sm:gap-3">
+        <button onclick="saveEdit()" class="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md hover:bg-blue-700 transition-colors">Enregistrer</button>
+        <button onclick="closeEditModal()" class="flex-1 bg-gray-200 text-gray-700 px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md hover:bg-gray-300 transition-colors">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="add-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4">
+    <div class="bg-white rounded-lg shadow-xl p-4 sm:p-5 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <h3 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Ajouter une ligne</h3>
+      <div class="space-y-3 sm:space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Module <span class="text-red-500">*</span></label>
+          <input id="add-module" type="text" placeholder="Ex: Achats" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md"/>
+          <p class="text-xs text-gray-500 mt-1">Doit correspondre à un module.</p>
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-1">Menu (optionnel)</label><input id="add-menu" type="text" placeholder="Ex: Commandes" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md"/></div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-1">Sous-menu (optionnel)</label><input id="add-submenu" type="text" placeholder="Ex: Liste" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md"/></div>
+        <div class="grid grid-cols-3 gap-2 sm:gap-3">
+          <div><label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Pages</label><input id="add-pages" type="number" min="0" class="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md" value="0"/></div>
+          <div><label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Exéc.</label><input id="add-executed" type="number" min="0" class="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md" value="0"/></div>
+          <div><label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Backend</label><input id="add-backend" type="number" min="0" class="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md" value="0"/></div>
+        </div>
+      </div>
+      <div class="mt-4 sm:mt-6 flex gap-2 sm:gap-3">
+        <button onclick="saveNewRow()" class="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md hover:bg-blue-700 transition-colors">Ajouter</button>
+        <button onclick="closeAddModal()" class="flex-1 bg-gray-200 text-gray-700 px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md hover:bg-gray-300 transition-colors">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const itemsPerPage = 50;
+    let filteredData = [];
+    let userRole = '';
+    let editingRowIndex = -1;
+    let tableData = [];
+
+    if (localStorage.getItem('isAuthenticated') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
+    userRole = localStorage.getItem('userRole') || 'viewer';
+    const userName = localStorage.getItem('userName') || 'Utilisateur';
+    document.getElementById('user-name').textContent = userName;
+    const roleBadge = document.getElementById('role-badge');
+    if (userRole === 'admin') {
+      roleBadge.textContent = 'Admin';
+      roleBadge.className = 'text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800 font-semibold';
+    } else {
+      roleBadge.textContent = 'Viewer';
+      roleBadge.className = 'text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-semibold';
+    }
+
+    const addBtn = document.getElementById('add-row-button');
+    if (userRole === 'admin' && addBtn) addBtn.classList.remove('hidden');
+
+    function buildModuleContext(arr) {
+      let currentModule = null;
+      arr.forEach(r => {
+        if (r.module) {
+          currentModule = r.module;
+          r._moduleCtx = r.module;
+        } else {
+          r._moduleCtx = currentModule;
+        }
+      });
+    }
+
+    function calculateDaysRemaining() {
+      const deadline = new Date('2026-02-18');
+      const today = new Date();
+      const diff = deadline - today;
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      document.getElementById('days-remaining').textContent = Math.max(days, 0);
+    }
+
+    document.getElementById('logout-button').addEventListener('click', function() {
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userName');
+      window.location.href = 'login.html';
+    });
+
+    function calculateStats(data) {
+      const stats = { pages: 0, pagesExecuted: 0, backend: 0, modules: new Set(), menus: new Set(), submenus: new Set() };
+      data.forEach(row => {
+        stats.pages += row.page || 0;
+        stats.pagesExecuted += row.page_executer || 0;
+        stats.backend += row.backend_logique || 0;
+        if (row.module) stats.modules.add(row.module);
+        if (row.menu) stats.menus.add(row.menu);
+        if (row.sous_menu) stats.submenus.add(row.sous_menu);
+      });
+      return { pages: stats.pages, pagesExecuted: stats.pagesExecuted, backend: stats.backend, modules: stats.modules.size, menus: stats.menus.size, submenus: stats.submenus.size };
+    }
+
+    function calculateCoefficient(totalPages) {
+      return totalPages > 0 ? 100 / (totalPages * 2) : 0;
+    }
+
+    function calculateTotalProgress(pagesExecuted, backend, coefficient) {
+      return (pagesExecuted + backend) * coefficient;
+    }
+
+    function calculateRowProgress(row) {
+      if (!row.page) return 0;
+      const executed = (row.page_executer || 0) + (row.backend_logique || 0);
+      const total = row.page * 2;
+      return (executed / total) * 100;
+    }
+
+    function getProgressColor(progress) {
+      if (progress >= 100) return 'bg-green-500';
+      if (progress >= 50) return 'bg-blue-500';
+      if (progress >= 25) return 'bg-yellow-500';
+      return 'bg-red-500';
+    }
+
+    function updateSummary(data) {
+      const stats = calculateStats(data);
+      const coefficient = calculateCoefficient(stats.pages);
+      const totalProgress = calculateTotalProgress(stats.pagesExecuted, stats.backend, coefficient);
+      document.getElementById('total-progress').textContent = totalProgress.toFixed(2) + '%';
+      document.getElementById('progress-bar').style.width = Math.min(totalProgress, 100) + '%';
+      document.getElementById('stat-pages').textContent = stats.pages;
+      document.getElementById('stat-executed').textContent = stats.pagesExecuted;
+      document.getElementById('stat-backend').textContent = stats.backend;
+      document.getElementById('stat-modules').textContent = stats.modules;
+      document.getElementById('stat-menus').textContent = stats.menus;
+      document.getElementById('stat-submenus').textContent = stats.submenus;
+      document.getElementById('footer-pages').textContent = stats.pages;
+      document.getElementById('footer-executed').textContent = stats.pagesExecuted;
+      document.getElementById('footer-backend').textContent = stats.backend;
+      document.getElementById('footer-progress').textContent = totalProgress.toFixed(2) + '%';
+    }
+
+    function openEditModal(rowIndex) {
+      if (userRole !== 'admin') { alert('Vous n\'avez pas les permissions pour modifier les données'); return; }
+      editingRowIndex = rowIndex;
+      const row = filteredData[rowIndex];
+      document.getElementById('edit-pages').value = row.page || 0;
+      document.getElementById('edit-executed').value = row.page_executer || 0;
+      document.getElementById('edit-backend').value = row.backend_logique || 0;
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      editingRowIndex = -1;
+    }
+
+    async function saveEdit() {
+      if (editingRowIndex === -1) return;
+      const row = filteredData[editingRowIndex];
+      const payload = {
+        page: parseInt(document.getElementById('edit-pages').value) || 0,
+        page_executer: parseInt(document.getElementById('edit-executed').value) || 0,
+        backend_logique: parseInt(document.getElementById('edit-backend').value) || 0
+      };
+      const id = row.id ?? row.row;
+      const res = await fetch(`/api/data/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.message || 'Échec de la mise à jour'); return; }
+      const updated = await res.json();
+      row.page = updated.page;
+      row.page_executer = updated.page_executer;
+      row.backend_logique = updated.backend_logique;
+      updateSummary(filteredData);
+      renderTable(filteredData, currentPage);
+      closeEditModal();
+    }
+
+    function openAddModal() {
+      if (userRole !== 'admin') { alert('Vous n\'avez pas les permissions pour ajouter des données'); return; }
+      document.getElementById('add-module').value = '';
+      document.getElementById('add-menu').value = '';
+      document.getElementById('add-submenu').value = '';
+      document.getElementById('add-pages').value = 0;
+      document.getElementById('add-executed').value = 0;
+      document.getElementById('add-backend').value = 0;
+      document.getElementById('add-modal').classList.remove('hidden');
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').classList.add('hidden');
+    }
+
+    async function saveNewRow() {
+      if (userRole !== 'admin') return;
+      const module = (document.getElementById('add-module').value || '').trim();
+      const menu = (document.getElementById('add-menu').value || '').trim();
+      const sous_menu = (document.getElementById('add-submenu').value || '').trim();
+      const page = parseInt(document.getElementById('add-pages').value) || 0;
+      const page_executer = parseInt(document.getElementById('add-executed').value) || 0;
+      const backend_logique = parseInt(document.getElementById('add-backend').value) || 0;
+      if (!module) { alert('Le module est obligatoire.'); return; }
+      const res = await fetch('/api/data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ module, menu, sous_menu, page, page_executer, backend_logique }) });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.message || 'Échec de l\'ajout'); return; }
+      const created = await res.json();
+      tableData.push(created);
+      buildModuleContext(tableData);
+      const moduleFilter = document.getElementById('module-filter');
+      if (![...moduleFilter.options].some(o => o.value === created.module) && created.module) {
+        const option = document.createElement('option'); option.value = created.module; option.textContent = created.module; moduleFilter.appendChild(option);
+      }
+      filterTable();
+      closeAddModal();
+    }
+
+    function renderTable(data, page = 1) {
+      const tableBody = document.getElementById('table-body');
+      tableBody.innerHTML = '';
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageData = data.slice(start, end);
+      pageData.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50 transition-colors';
+        if (row.module && !row.menu) tr.classList.add('bg-blue-50');
+        if ((row.page_executer && row.page_executer > 0) || (row.backend_logique && row.backend_logique > 0)) tr.classList.add('bg-green-50');
+        const progress = calculateRowProgress(row);
+        const progressColor = getProgressColor(progress);
+        const actualIndex = start + index;
+        const clickHandler = userRole === 'admin' ? `onclick="openEditModal(${actualIndex})" style="cursor: pointer;"` : '';
+        tr.innerHTML = `
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm whitespace-nowrap">${row.module ? `<span class="font-semibold text-gray-900">${row.module}</span>` : ''}</td>
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm whitespace-nowrap">${row.menu ? `<span class="text-gray-900 ${!row.module ? 'ml-4' : ''}">${row.menu}</span>` : ''}</td>
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm whitespace-nowrap">${row.sous_menu ? `<span class="text-gray-700 ${!row.menu ? 'ml-8' : ''}">${row.sous_menu}</span>` : ''}</td>
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm text-center" ${clickHandler}>${row.page ? `<span class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-blue-100 text-blue-800 font-semibold text-xs sm:text-sm ${userRole === 'admin' ? 'hover:bg-blue-200' : ''}">${row.page}</span>` : ''}</td>
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm text-center" ${clickHandler}>${row.page_executer ? `<span class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-green-100 text-green-800 font-semibold text-xs sm:text-sm ${userRole === 'admin' ? 'hover:bg-green-200' : ''}">${row.page_executer}</span>` : ''}</td>
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm text-center" ${clickHandler}>${row.backend_logique ? `<span class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-purple-100 text-purple-800 font-semibold text-xs sm:text-sm ${userRole === 'admin' ? 'hover:bg-purple-200' : ''}">${row.backend_logique}</span>` : ''}</td>
+          <td class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm text-center">
+            ${row.page ? `
+              <div class="flex flex-col items-center gap-1 min-w-[60px] sm:min-w-[80px]">
+                <div class="w-full bg-gray-200 rounded-full h-1.5 sm:h-2"><div class="${progressColor} h-1.5 sm:h-2 rounded-full transition-all" style="width: ${progress}%;"></div></div>
+                <span class="text-xs font-medium text-gray-700">${progress.toFixed(0)}%</span>
+              </div>` : ''}
+          </td>`;
+        tableBody.appendChild(tr);
+      });
+      document.getElementById('page-start').textContent = data.length > 0 ? start + 1 : 0;
+      document.getElementById('page-end').textContent = Math.min(end, data.length);
+      document.getElementById('page-total').textContent = data.length;
+      renderPagination(data.length, page);
+    }
+
+    function renderPagination(totalItems, currentPageNum) {
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      if (totalPages <= 1) return;
+      
+      const prevBtn = document.createElement('button');
+      prevBtn.innerHTML = '<span class="hidden sm:inline">Précédent</span><span class="sm:hidden">Préc</span>';
+      prevBtn.className = 'px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-md text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 transition-colors';
+      prevBtn.disabled = currentPageNum === 1;
+      prevBtn.onclick = () => { if (currentPageNum > 1) { currentPage--; renderTable(filteredData, currentPage); } };
+      pagination.appendChild(prevBtn);
+      
+      const startPage = Math.max(1, currentPageNum - 1);
+      const endPage = Math.min(totalPages, startPage + 2);
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        pageBtn.className = `px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border rounded-md text-xs sm:text-sm font-medium transition-colors ${i === currentPageNum ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`;
+        pageBtn.onclick = () => { currentPage = i; renderTable(filteredData, currentPage); };
+        pagination.appendChild(pageBtn);
+      }
+      
+      const nextBtn = document.createElement('button');
+      nextBtn.innerHTML = '<span class="hidden sm:inline">Suivant</span><span class="sm:hidden">Suiv</span>';
+      nextBtn.className = 'px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-md text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 transition-colors';
+      nextBtn.disabled = currentPageNum === totalPages;
+      nextBtn.onclick = () => { if (currentPageNum < totalPages) { currentPage++; renderTable(filteredData, currentPage); } };
+      pagination.appendChild(nextBtn);
+    }
+
+    function filterTable() {
+      const searchValue = document.getElementById('search-input').value.toLowerCase();
+      const moduleFilter = document.getElementById('module-filter').value || '';
+      buildModuleContext(tableData);
+      filteredData = tableData.filter(row => {
+        if (moduleFilter && row._moduleCtx !== moduleFilter) return false;
+        if (searchValue) {
+          const searchIn = [row.module, row.menu, row.sous_menu].filter(Boolean).join(' ').toLowerCase();
+          if (!searchIn.includes(searchValue)) return false;
+        }
+        return true;
+      });
+      currentPage = 1;
+      updateSummary(filteredData);
+      renderTable(filteredData, currentPage);
+    }
+
+    function clearFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('module-filter').value = '';
+      filterTable();
+    }
+
+    async function fetchServerData() {
+      const res = await fetch('/api/data');
+      if (!res.ok) return [];
+      const body = await res.json();
+      return Array.isArray(body) ? body : (body.rows || []);
+    }
+
+    async function maybeAutoImportFromEmbed() {
+      if (window.tableData && Array.isArray(window.tableData) && window.tableData.length > 0) {
+        await fetch('/api/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rows: window.tableData }) }).catch(()=>{});
+      }
+    }
+
+    function normalizeRows(rows) {
+      return rows.map(r => ({ id: r.id ?? r.row, module: r.module ?? null, menu: r.menu ?? null, sous_menu: r.sous_menu ?? null, page: r.page ?? 0, page_executer: r.page_executer ?? 0, backend_logique: r.backend_logique ?? 0 }));
+    }
+
+    async function init() {
+      calculateDaysRemaining();
+      let rows = await fetchServerData();
+      if (rows.length === 0 && window.tableData && Array.isArray(window.tableData) && window.tableData.length > 0) {
+        await maybeAutoImportFromEmbed();
+        rows = await fetchServerData();
+      }
+      tableData = normalizeRows(rows);
+      const modules = [...new Set(tableData.filter(r => r.module).map(r => r.module))].sort();
+      const moduleFilter = document.getElementById('module-filter');
+      modules.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; moduleFilter.appendChild(o); });
+      filteredData = tableData;
+      buildModuleContext(tableData);
+      updateSummary(filteredData);
+      renderTable(filteredData, currentPage);
+    }
+
+    init();
+  </script>
+</body>
+</html>
